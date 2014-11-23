@@ -70,4 +70,3 @@ pub struct CrateTranslation {
     pub crate_formats: dependency_format::Dependencies,
     pub no_builtins: bool,
 }
-
