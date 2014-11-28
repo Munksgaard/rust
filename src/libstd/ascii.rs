@@ -633,8 +633,8 @@ static ASCII_UPPER_MAP: [u8, ..256] = [
 
 #[cfg(test)]
 mod tests {
-    use prelude::*;
     use super::*;
+    use prelude::*;
     use char::from_u32;
     use str::StrPrelude;
 
