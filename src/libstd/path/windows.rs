@@ -1118,8 +1118,10 @@ fn prefix_len(p: Option<PathPrefix>) -> uint {
 
 #[cfg(test)]
 mod tests {
-    use prelude::*;
+    use mem;
     use super::*;
+    use prelude::*;
+    use super::Path;
     use super::parse_prefix;
 
     macro_rules! t(

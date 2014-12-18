@@ -341,6 +341,11 @@ pub fn phase_3_run_analysis_passes<'tcx>(sess: Session,
     let lang_items = time(time_passes, "language item collection", (), |_|
                           middle::lang_items::collect_language_items(krate, &sess));
 
+    let make_glob_map = if save_analysis(&sess) {
+        middle::resolve::MakeGlobMap::Yes
+    } else {
+        middle::resolve::MakeGlobMap::No
+    };
     let middle::resolve::CrateMap {
         def_map,
         freevars,
@@ -348,10 +353,15 @@ pub fn phase_3_run_analysis_passes<'tcx>(sess: Session,
         exp_map2,
         trait_map,
         external_exports,
-        last_private_map
+        last_private_map,
+        glob_map,
     } =
         time(time_passes, "resolution", (), |_|
-             middle::resolve::resolve_crate(&sess, &lang_items, krate));
+             middle::resolve::resolve_crate(&sess,
+                                            &ast_map,
+                                            &lang_items,
+                                            krate,
+                                            make_glob_map));
 
     // Discard MTWT tables that aren't required past resolution.
     syntax::ext::mtwt::clear_tables();
@@ -453,14 +463,19 @@ pub fn phase_3_run_analysis_passes<'tcx>(sess: Session,
         public_items: public_items,
         reachable: reachable_map,
         name: name,
+        glob_map: glob_map,
     }
+}
+
+fn save_analysis(sess: &Session) -> bool {
+    (sess.opts.debugging_opts & config::SAVE_ANALYSIS) != 0
 }
 
 pub fn phase_save_analysis(sess: &Session,
                            krate: &ast::Crate,
                            analysis: &ty::CrateAnalysis,
                            odir: &Option<Path>) {
-    if (sess.opts.debugging_opts & config::SAVE_ANALYSIS) == 0 {
+    if !save_analysis(sess) {
         return;
     }
     time(sess.time_passes(), "save analysis", krate, |krate|

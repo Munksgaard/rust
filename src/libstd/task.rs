@@ -281,14 +281,13 @@ mod test {
     use any::{Any, AnyRefExt};
     use borrow::IntoCow;
     use boxed::BoxAny;
-    use prelude::*;
     use result::Result::{Ok, Err};
     use result;
     use std::io::{ChanReader, ChanWriter};
     use string::String;
     use thunk::Thunk;
-    use prelude::*;
     use super::*;
+    use prelude::*;
 
     // !!! These tests are dangerous. If something is buggy, they will hang, !!!
     // !!! instead of exiting cleanly. This might wedge the buildbots.       !!!
